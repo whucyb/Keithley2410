@@ -109,5 +109,5 @@ class keithley2410:
         self.kei2410.close()
 
 if __name__=="__main__":
-    kei2410=keithley2410("ASRL5::INSTR")
+    kei2410=keithley2410("ASRL6::INSTR")
     kei2410.testIO()
