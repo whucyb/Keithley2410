@@ -25,11 +25,31 @@ class keithley2410:
         self.kei2410.write(":sense:current:protection "+self.cmpl)
         self.kei2410.write(":source:function voltage")
         self.kei2410.write(":source:voltage:mode fixed")
+        print("******************************")
         print("From")
         vols=self.show_voltage()
-        self.sweep(vols,vol,0.1,speed)
+        print("******************************")
+        if -10<=vol<=10 and -10<=vols<=10:
+            self.sweep(vols,vol,1,speed)
+        elif -10<=vol<=10 and vols <-10:
+            self.sweep(vols,-10,10,speed)
+            self.sweep(-10,vol,1,speed)
+        elif -10<=vol<=10 and vols>10:
+            self.sweep(vols,10,10,speed)
+            self.sweep(10,vol,1,speed)
+        elif vol<-10 and -10<=vols<=10:
+            self.sweep(vols,-10,1,speed)
+            self.sweep(-10,vol,10,speed)
+        elif vol>10 and -10<=vols<=10:
+            self.sweep(vols,10,1,speed)
+            self.sweep(10,vol,10,speed)
+        else :
+            self.sweep(vols,vol,10,speed)
+        print("******************************")
         print("To")
         vols=self.show_voltage()
+        print("******************************")
+        self.beep()
         return vols
 
     def show_voltage(self):
@@ -37,7 +57,7 @@ class keithley2410:
         self.kei2410.write(":form:elem voltage")
         voltage=self.kei2410.query(":read?")
         # self.kei2410.timeout=5000
-        print("voltage [V]:  " + str(voltage))
+        print("voltage [V]: " + str(voltage))
         return float(str(voltage))
 
     def sweep(self, vols, vole, step, speed):
@@ -54,7 +74,10 @@ class keithley2410:
         for mvol in range(int(mvols),int(mvole),int(mstep)):
             vol=mvol/1000 # mV -> V
             self.kei2410.write(":source:voltage:level "+str(vol))
-            time.sleep(0.1/speed)
+            time.sleep(5/speed)
+            self.show_voltage()
+            self.display_current()
+            self.hit_compliance()
 
     def sweep_backward(self, vols, vole, step,speed):
         # Conveter from V to mV
@@ -65,7 +88,10 @@ class keithley2410:
         for mvol in range(int(mvols),int(mvole), -int(mstep)):
             vol=mvol/1000 # mV -> V
             self.kei2410.write(":source:voltage:level "+str(vol))
-            time.sleep(0.1/speed)
+            time.sleep(5/speed)
+            self.show_voltage()
+            self.display_current()
+            self.hit_compliance()
 
     def display_current(self):
         self.kei2410.write(":sense:function 'current'")
@@ -76,7 +102,7 @@ class keithley2410:
         self.kei2410.write(":form:elem current")
         current=self.kei2410.query(":read?")
         #self.kei2410.timeout=5000
-        print("current [A]:  " + str(current))
+        print("current [A]: " + str(current))
         return float(str(current))
 
     def hit_compliance(self):
@@ -85,13 +111,19 @@ class keithley2410:
             print("Hit the compliance "+self.cmpl+"A.")
         return tripped
 
+    def ramp_down(self):
+        print("Now ramping down...")                                                                                                                                                                  
+        self.set_voltage(0,1)
+        self.beep()
+
+
     def output_on(self):
         self.kei2410.write(":output on")
-        print("On")
+        print("Output on")
 
     def output_off(self):
         self.kei2410.write(":output off")
-        print("Off")
+        print("Output off")
 
     def beep(self, freq=1046.50, duration=0.3):
         self.kei2410.write(":system:beeper "+str(freq)+", "+str(duration))

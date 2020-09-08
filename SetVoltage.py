@@ -9,5 +9,4 @@ HV=int(sys.argv[1])
 
 bias_supply.filter_off()
 bias_supply.output_on()
-bias_supply.set_voltage(HV,5)
-bias_supply.display_current()
+bias_supply.set_voltage(HV,1)
