@@ -5,7 +5,7 @@ import warnings
 class keithley2410:
     def __init__(self,resource_name):
         instlist=pyvisa.ResourceManager()
-        print(instlist.list_resources())
+        #print(instlist.list_resources())
         self.kei2410=instlist.open_resource(resource_name)
         self.kei2410.timeout=25000
         self.cmpl='105E-6' # global current protection
