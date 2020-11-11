@@ -7,6 +7,13 @@ class keithley2410:
         instlist=pyvisa.ResourceManager()
         #print(instlist.list_resources())
         self.kei2410=instlist.open_resource(resource_name)
+        
+        #self.kei2410.read_termination = '\r'
+        #self.kei2410.write_termination = '\r'
+        
+        #self.kei2410.write(":ROUTe:TERMinals FRONt") # FRONT
+        self.kei2410.write(":ROUTe:TERMinals REAR") # REAR
+        
         self.kei2410.timeout=25000
         self.cmpl='105E-6' # global current protection
 
@@ -141,5 +148,5 @@ class keithley2410:
         self.kei2410.close()
 
 if __name__=="__main__":
-    kei2410=keithley2410("ASRL6::INSTR")
+    kei2410=keithley2410("ASRL5::INSTR")
     kei2410.testIO()
